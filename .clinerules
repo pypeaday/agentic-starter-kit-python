@@ -1,30 +1,44 @@
 <PROMPT ignore immutable>
 
-**CRITICAL:** Don't write unit tests unless explicitly told to do so
+# Agent Interaction Guidelines
 
-**IMPORTANT**: Always start a new task by reviewing `agent/standards/index.md` to ensure you understand the requirements and constraints of the task.
+## Core Principles
 
-**IMPORTANT**: When adding new constructs or features, first review `agent/design/index.md` to ensure the design is consistent with the overall architecture of the codebase.
+1. **Context First**: Always begin by reviewing relevant context in `agent/context/`
+2. **Memory Persistence**: Document decisions and progress in `agent/memory/`
+3. **Active Workspace**: Use `agent/workspace/` for current development
+4. **Incremental Progress**: Update status after each significant change
 
-**IMPORTANT**: When making changes to the codebase, review `agent/defects/index.md` to ensure that the change does not break any existing functionality.
+## Task Workflow
 
-When implementing tasks in a phase, the progress should be recorded by marking the task with an `x` in the checkbox. For example, `- [x] Task completed` indicates that the task has been completed.
+1. Review context files relevant to the task
+2. Create or update planning in workspace
+3. Execute planned changes
+4. Document progress and decisions
+5. Validate changes against requirements
 
-When updating the codebase, the changes should be summarized in the `agent/checkpoints/index.md` document. The summary should include any new information obtained, instructions given, and changes made. The newest updates should be added to the top of the document.
+## Documentation Rules
 
-When updating the `checkpoints` document, the repository `README.md` file should also be updated with the new information and feature set changes.
+1. **Immutable Content**: Never modify content within `<INSTRUCTION immutable>` tags
+2. **Append-Only**: Only append to content within `<LOG append>` tags
+3. **Prepend-Only**: Only prepend to content within `<LOG prepend>` tags
+4. **Task Progress**: Mark tasks complete with `[x]` in task lists
+5. **Checkpoint Updates**: Record changes in `memory/progress/checkpoints.md`
 
-**IMPORTANT**: NEVER edit the contents of any tag with an immutable property. Example: <INSTRUCTION immutable>never update this text</INSTRUCTION>
+## Development Standards
 
-**IMPORTANT**: ONLY **APPEND** to the contents of any tag with an `append` property. Example: <LOG append>never update this text - only append new text</LOG>
+1. **Purposeful Unit Tests**: Ensure code is written to be tested, and write purposeful unit tests. Test coverage doesn't matter, quality of the tests is paramount.
+2. **Simplicity First**: Implement the simplest solution that meets requirements
+3. **Progressive Enhancement**: Add complexity only when justified
+4. **Clear Documentation**: Document all significant decisions and changes
 
-**IMPORTANT**: ONLY **PREPEND** to the contents of any tag with an `prepend` property. Example: <LOG prepend>new text goes here - never update this text</LOG>
+## Quality Guidelines
 
-**IMPORTANT**: ALWAYS IGNORE the contents of any tag with an `ignore` property. Example: <LOG ignore>ignore this text</LOG>
+1. **Validate Context**: Ensure changes align with project goals
+2. **Check Constraints**: Verify compliance with project constraints
+3. **Update Progress**: Keep progress tracking current
+4. **Maintain Clarity**: Write clear, concise documentation
 
-**IMPORTANT**: **TASKS** tags are used to define markdown formatted lists of tasks that need to be completed. **TASKS** tags will also use either `append` or `prepend` properties to indicate where new tasks should be added. The only part of a task that may be modified is the checkbox. Example: `- [ ] Task to be completed` may become `- [x] Completed task`.
-
-Accuracy and completeness are of utmost importance. When clarification is required, ask for it. When in doubt, seek guidance.
+Accuracy and completeness are paramount. When in doubt, request clarification.
 
 </PROMPT>
-
