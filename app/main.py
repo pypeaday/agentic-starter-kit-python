@@ -7,7 +7,16 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from pydantic import BaseModel
 
-from . import models, database, themes, auth, auth_routes, admin_routes, todo_routes
+from . import (
+    models,
+    database,
+    themes,
+    auth,
+    auth_routes,
+    admin_routes,
+    todo_routes,
+    roles,
+)
 from .auth import get_optional_current_user
 
 app = FastAPI(title="FastAPI HTMX Starter")
@@ -112,14 +121,19 @@ inspector = inspect(database.engine)
 existing_tables = inspector.get_table_names()
 
 # Database should be created by alembic migrations
-# Create admin user if it doesn't exist
-print("Checking for admin user...")
+# Initialize database with admin user and default roles
+print("Initializing database...")
 with database.SessionLocal() as db:
     try:
+        # Create admin user if it doesn't exist
         admin = auth.ensure_admin_exists(db)
         print(f"Admin user confirmed: {admin.email}")
+
+        # Create default roles if they don't exist
+        roles.ensure_default_roles_exist(db)
+        print("Default roles confirmed")
     except Exception as e:
-        print(f"Error ensuring admin user exists: {e}")
+        print(f"Error initializing database: {e}")
         raise
 
 

@@ -5,24 +5,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime
+import json
 
-from . import models, database, auth, schemas
+from . import models, database, auth, schemas, roles
+from .roles import requires_permission
+from .auth import get_password_hash
 from .database import get_db
-
-
-# Create a dependency that will check for admin role
-def admin_dependency(
-    token: str = Depends(auth.oauth2_scheme), db: Session = Depends(get_db)
-):
-    user = auth.get_current_user_sync(token, db)
-    if not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    if user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized. Admin role required.",
-        )
-    return user
 
 
 router = APIRouter(
@@ -35,9 +23,10 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
+@requires_permission("view_system")
 async def admin_dashboard(
     request: Request,
-    current_user: models.User = Depends(admin_dependency),
+    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
 ):
     """Admin dashboard showing system statistics and management options."""
@@ -62,9 +51,10 @@ async def admin_dashboard(
 
 
 @router.get("/users", response_class=HTMLResponse)
+@requires_permission("view_users")
 async def list_users(
     request: Request,
-    current_user: models.User = Depends(auth.get_current_admin_user),
+    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
 ):
     """List all users in the system."""
@@ -80,45 +70,287 @@ async def list_users(
     )
 
 
-@router.post("/users/{user_id}/toggle-role")
-async def toggle_user_role(
-    user_id: int,
-    current_user: models.User = Depends(auth.get_current_admin_user),
+@router.get("/users/new", response_class=HTMLResponse)
+@requires_permission("manage_users")
+async def new_user_form(
+    request: Request,
+    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
 ):
-    """Toggle a user's role between 'user' and 'admin'."""
+    """Show form to create a new user."""
+    roles = db.query(models.Role).all()
+    return templates.TemplateResponse(
+        "admin/user_form.html",
+        {
+            "request": request,
+            "current_user": current_user,
+            "user": None,
+            "roles": roles,
+            "is_new": True,
+        },
+    )
+
+
+@router.get("/users/{user_id}/edit", response_class=HTMLResponse)
+@requires_permission("manage_users")
+async def edit_user_form(
+    user_id: int,
+    request: Request,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """Show form to edit a user."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Don't allow admins to demote themselves
-    if user.id == current_user.id:
-        raise HTTPException(status_code=400, detail="Cannot change your own role")
+    roles = db.query(models.Role).all()
+    return templates.TemplateResponse(
+        "admin/user_form.html",
+        {
+            "request": request,
+            "current_user": current_user,
+            "user": user,
+            "roles": roles,
+            "is_new": False,
+        },
+    )
 
-    # Toggle role
-    user.role = "admin" if user.role == "user" else "user"
-    db.commit()
 
-    return {"success": True, "role": user.role}
-
-
-@router.post("/users/{user_id}/toggle-active")
-async def toggle_user_active(
-    user_id: int,
-    current_user: models.User = Depends(auth.get_current_admin_user),
+@router.post("/users")
+@requires_permission("manage_users")
+async def create_user(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    name: str = Form(None),
+    role: str = Form("user"),
+    is_active: bool = Form(True),
+    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
 ):
-    """Toggle a user's active status."""
+    """Create a new user."""
+    # Check if email already exists
+    if db.query(models.User).filter(models.User.email == email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Validate role exists
+    if not db.query(models.Role).filter(models.Role.name == role).first():
+        raise HTTPException(status_code=400, detail="Invalid role")
+
+    # Create user
+    user = models.User(
+        email=email,
+        name=name,
+        hashed_password=get_password_hash(password),
+        role=role,
+        is_active=is_active,
+        created_at=datetime.utcnow(),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return RedirectResponse(
+        url="/admin/users",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.put("/users/{user_id}")
+@requires_permission("manage_users")
+async def update_user(
+    user_id: int,
+    email: str = Form(...),
+    name: str = Form(None),
+    role: str = Form("user"),
+    is_active: bool = Form(True),
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """Update a user's information."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Don't allow admins to deactivate themselves
+    # Don't allow admins to modify themselves
     if user.id == current_user.id:
-        raise HTTPException(status_code=400, detail="Cannot deactivate yourself")
+        raise HTTPException(status_code=400, detail="Cannot modify your own account")
 
-    # Toggle active status
-    user.is_active = not user.is_active
+    # Check if email is taken by another user
+    existing_user = (
+        db.query(models.User)
+        .filter(models.User.email == email, models.User.id != user_id)
+        .first()
+    )
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already taken")
+
+    # Validate role exists
+    if not db.query(models.Role).filter(models.Role.name == role).first():
+        raise HTTPException(status_code=400, detail="Invalid role")
+
+    # Update user
+    user.email = email
+    user.name = name
+    user.role = role
+    user.is_active = is_active
     db.commit()
 
-    return {"success": True, "is_active": user.is_active}
+    return RedirectResponse(
+        url="/admin/users",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.post("/users/{user_id}/reset-password")
+@requires_permission("manage_users")
+async def reset_user_password(
+    user_id: int,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """Reset a user's password to a random string."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Don't allow admins to reset their own password
+    if user.id == current_user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot reset your own password. Use the profile page instead.",
+        )
+
+    # Generate random password
+    import secrets
+    import string
+
+    alphabet = string.ascii_letters + string.digits
+    password = "".join(secrets.choice(alphabet) for _ in range(12))
+
+    # Update password
+    user.hashed_password = get_password_hash(password)
+    db.commit()
+
+    return {"success": True, "password": password}
+
+
+@router.get("/roles", response_class=HTMLResponse)
+@requires_permission("view_roles")
+async def list_roles(
+    request: Request,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """List all roles."""
+    roles = db.query(models.Role).all()
+    return templates.TemplateResponse(
+        "admin/roles.html",
+        {
+            "request": request,
+            "current_user": current_user,
+            "user": current_user,
+            "roles": roles,
+        },
+    )
+
+
+@router.post("/roles")
+@requires_permission("manage_roles")
+async def create_role(
+    name: str = Form(...),
+    description: str = Form(None),
+    permissions: str = Form("{}"),  # JSON string of permissions
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """Create a new role."""
+    # Validate name is unique
+    if db.query(models.Role).filter(models.Role.name == name).first():
+        raise HTTPException(status_code=400, detail="Role name already exists")
+
+    # Validate permissions JSON
+    try:
+        json.loads(permissions)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid permissions format")
+
+    role = models.Role(
+        name=name,
+        description=description,
+        permissions=permissions,
+        created_at=datetime.utcnow(),
+    )
+    db.add(role)
+    db.commit()
+
+    return RedirectResponse(
+        url="/admin/roles",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.put("/roles/{role_id}")
+@requires_permission("manage_roles")
+async def update_role(
+    role_id: int,
+    name: str = Form(...),
+    description: str = Form(None),
+    permissions: str = Form("{}"),
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """Update a role."""
+    role = db.query(models.Role).filter(models.Role.id == role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+
+    # Check if new name is taken by another role
+    existing_role = (
+        db.query(models.Role)
+        .filter(models.Role.name == name, models.Role.id != role_id)
+        .first()
+    )
+    if existing_role:
+        raise HTTPException(status_code=400, detail="Role name already taken")
+
+    # Validate permissions JSON
+    try:
+        json.loads(permissions)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid permissions format")
+
+    role.name = name
+    role.description = description
+    role.permissions = permissions
+    db.commit()
+
+    return RedirectResponse(
+        url="/admin/roles",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.delete("/roles/{role_id}")
+@requires_permission("manage_roles")
+async def delete_role(
+    role_id: int,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a role."""
+    role = db.query(models.Role).filter(models.Role.id == role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+
+    # Don't allow deleting roles that are in use
+    if db.query(models.User).filter(models.User.role == role.name).first():
+        raise HTTPException(
+            status_code=400, detail="Cannot delete role that is assigned to users"
+        )
+
+    db.delete(role)
+    db.commit()
+
+    return {"success": True}

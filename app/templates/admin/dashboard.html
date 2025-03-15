@@ -8,43 +8,43 @@
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- User Stats Card -->
-        <div class="bg-bg1 border border-bg2 rounded-lg p-4 shadow-md">
-            <h2 class="text-xl font-semibold text-yellow-400 mb-2">Users</h2>
-            <p class="text-3xl font-bold text-blue-400">{{ user_count }}</p>
-            <p class="text-fg1">Total registered users</p>
-            <a href="/admin/users" class="mt-4 inline-block text-blue-400 hover:text-aqua-400 transition">
-                Manage Users →
-            </a>
-        </div>
-    
-    <!-- Recent Users Section -->
-    <div class="bg-bg1 border border-bg2 rounded-lg p-4 shadow-md mb-8">
-        <h2 class="text-xl font-semibold text-yellow-400 mb-4">Recent Users</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-bg2 rounded-lg overflow-hidden">
-                <thead class="bg-bg3">
+        <div class="bg-theme-bg1 border border-theme-bg2 rounded-lg p-4 shadow-md">
+                    <h2 class="text-xl font-semibold text-theme-accent mb-2">Users</h2>
+                    <p class="text-3xl font-bold text-theme-accent">{{ user_count }}</p>
+                    <p class="text-theme-fg1">Total registered users</p>
+                    <a href="/admin/users" class="mt-4 inline-block text-theme-accent hover:opacity-80 transition">
+                        Manage Users →
+                    </a>
+                </div>
+            
+            <!-- Recent Users Section -->
+            <div class="bg-theme-bg1 border border-theme-bg2 rounded-lg p-4 shadow-md mb-8">
+                <h2 class="text-xl font-semibold text-theme-accent mb-4">Recent Users</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-theme-bg2 rounded-lg overflow-hidden">
+                        <thead class="bg-theme-bg">
                     <tr>
-                        <th class="py-2 px-4 text-left text-fg1">Email</th>
-                        <th class="py-2 px-4 text-left text-fg1">Role</th>
-                        <th class="py-2 px-4 text-left text-fg1">Status</th>
-                        <th class="py-2 px-4 text-left text-fg1">Created</th>
+                        <th class="py-2 px-4 text-left text-theme-fg1">Email</th>
+                        <th class="py-2 px-4 text-left text-theme-fg1">Role</th>
+                        <th class="py-2 px-4 text-left text-theme-fg1">Status</th>
+                        <th class="py-2 px-4 text-left text-theme-fg1">Created</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in recent_users %}
-                    <tr class="border-t border-bg3">
+                    <tr class="border-t border-theme-bg">
                         <td class="py-2 px-4">{{ user.email }}</td>
                         <td class="py-2 px-4">
-                            <span class="px-2 py-1 rounded text-xs font-medium 
-                                {% if user.role == 'admin' %}bg-red-900 text-red-300
-                                {% else %}bg-blue-900 text-blue-300{% endif %}">
+                            <span class="px-2 py-1 rounded text-xs font-medium
+                                {% if user.role == 'admin' %}bg-theme-error text-white
+                                {% else %}bg-theme-accent text-white{% endif %}">
                                 {{ user.role }}
                             </span>
                         </td>
                         <td class="py-2 px-4">
-                            <span class="px-2 py-1 rounded text-xs font-medium 
-                                {% if user.is_active %}bg-green-900 text-green-300
-                                {% else %}bg-red-900 text-red-300{% endif %}">
+                            <span class="px-2 py-1 rounded text-xs font-medium
+                                {% if user.is_active %}bg-theme-success text-white
+                                {% else %}bg-theme-error text-white{% endif %}">
                                 {{ 'Active' if user.is_active else 'Inactive' }}
                             </span>
                         </td>
@@ -57,21 +57,28 @@
     </div>
     
     <!-- Admin Actions -->
-    <div class="bg-bg1 border border-bg2 rounded-lg p-4 shadow-md">
-        <h2 class="text-xl font-semibold text-yellow-400 mb-4">Admin Actions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a href="/admin/users" class="bg-bg2 hover:bg-bg3 border border-bg3 rounded-lg p-4 transition flex items-center">
-                <div class="mr-4 text-blue-400 text-2xl">👥</div>
+    <div class="bg-theme-bg1 border border-theme-bg2 rounded-lg p-4 shadow-md">
+        <h2 class="text-xl font-semibold text-theme-accent mb-4">Admin Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="/admin/users" class="bg-theme-bg2 hover:bg-theme-bg border border-theme-bg2 rounded-lg p-4 transition flex items-center">
+                <div class="mr-4 text-theme-accent text-2xl">👥</div>
                 <div>
-                    <h3 class="font-medium text-fg">Manage Users</h3>
-                    <p class="text-fg1 text-sm">View, edit, and manage user accounts</p>
+                    <h3 class="font-medium text-theme-fg">Manage Users</h3>
+                    <p class="text-theme-fg1 text-sm">View and edit user accounts</p>
                 </div>
             </a>
-            <a href="/admin/stats" class="bg-bg2 hover:bg-bg3 border border-bg3 rounded-lg p-4 transition flex items-center">
-                <div class="mr-4 text-blue-400 text-2xl">📊</div>
+            <a href="/admin/users/new" class="bg-theme-bg2 hover:bg-theme-bg border border-theme-bg2 rounded-lg p-4 transition flex items-center">
+                <div class="mr-4 text-theme-accent text-2xl">➕</div>
                 <div>
-                    <h3 class="font-medium text-fg">System Statistics</h3>
-                    <p class="text-fg1 text-sm">View detailed system statistics</p>
+                    <h3 class="font-medium text-theme-fg">Create User</h3>
+                    <p class="text-theme-fg1 text-sm">Add new user accounts</p>
+                </div>
+            </a>
+            <a href="/admin/roles" class="bg-theme-bg2 hover:bg-theme-bg border border-theme-bg2 rounded-lg p-4 transition flex items-center">
+                <div class="mr-4 text-theme-accent text-2xl">🔑</div>
+                <div>
+                    <h3 class="font-medium text-theme-fg">Manage Roles</h3>
+                    <p class="text-theme-fg1 text-sm">Configure role permissions</p>
                 </div>
             </a>
         </div>
