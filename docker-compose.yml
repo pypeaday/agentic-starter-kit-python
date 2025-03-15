@@ -6,7 +6,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_HOST=http://ollama:11435
       - DATABASE_URL=sqlite:///data/foo.db
     env_file: .env
     restart: unless-stopped
@@ -18,7 +18,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     ports:
-      - "11434:11434"
+      - "11435:11434"
     deploy:
       resources:
         reservations:

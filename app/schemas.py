@@ -4,7 +4,6 @@ from enum import Enum
 from datetime import datetime
 
 
-# User schemas
 class UserBase(BaseModel):
     email: EmailStr
 

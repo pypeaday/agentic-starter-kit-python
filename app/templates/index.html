@@ -4,8 +4,8 @@
 <div class="max-w-7xl mx-auto">
     {% if not user %}
     <div class="mb-8 bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2 text-center">
-        <h2 class="text-xl font-bold text-theme-accent mb-4">Welcome to Book Tracker!</h2>
-        <p class="text-theme-fg mb-4">Track your reading progress, organize your books, and keep a record of your reading journey.</p>
+        <h2 class="text-xl font-bold text-theme-accent mb-4">Welcome to Foo App!</h2>
+        <p class="text-theme-fg mb-4">A starter kit with FastAPI, HTMX, and SQLite.</p>
         <div class="flex justify-center space-x-4">
             <a href="/login" class="px-4 py-2 bg-theme-accent text-white rounded-md hover:opacity-90 transition-opacity">
                 <i class="fas fa-sign-in-alt mr-2"></i>Login
@@ -172,42 +172,7 @@
             setupDragAndDrop();
         });
     </script>
-    <!-- Header with stats -->
-    <div class="mb-8 bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2">
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {% for status in ['reading', 'to_read', 'completed', 'dnf'] %}
-            <div class="text-center">
-                <div class="text-2xl font-bold text-theme-accent">{{ books|selectattr('status', 'equalto', status)|list|length }}</div>
-                <div class="text-sm text-theme-fg1">{{ {'reading': 'Reading', 'to_read': 'To Read', 'completed': 'Completed', 'dnf': 'Did Not Finish'}[status] }}</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
 
-    <!-- Book grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for status in ['reading', 'to_read', 'completed', 'dnf'] %}
-        <div class="bg-theme-bg1 rounded-lg shadow-lg border border-theme-bg2 overflow-hidden status-column" data-status="{{ status }}">
-            <div class="bg-theme-bg2 px-6 py-4 border-b border-theme-bg2">
-                <h2 class="text-xl font-bold text-theme-fg flex items-center">
-                    <i class="fas fa-{{ {'reading': 'book-open', 'to_read': 'list', 'completed': 'check', 'dnf': 'times'}[status] }} mr-2"></i>
-                    <span>{{ {'reading': 'Reading', 'to_read': 'To Read', 'completed': 'Completed', 'dnf': 'Did Not Finish'}[status] }}</span>
-                    <span class="ml-auto text-sm font-normal bg-theme-bg2 px-2 py-1 rounded-full">{{ books|selectattr('status', 'equalto', status)|list|length }}</span>
-                </h2>
-            </div>
-            <div class="p-4 space-y-3 book-list">
-                 
-                {% for book in books if book.status == status %}
-                {% include "partials/book_card.html" %}
-                {% else %}
-                <div class="text-center py-8 text-theme-fg1">
-                    <i class="fas fa-book text-4xl mb-2 opacity-30"></i>
-                    <p>No books yet</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+
 </div>
 {% endblock %}

@@ -225,9 +225,6 @@ async def profile(
     """Display user profile."""
     theme, current_theme = get_current_theme(request)
 
-    # Get user's books
-    books = db.query(models.Book).filter(models.Book.user_id == current_user.id).all()
-
     response = templates.TemplateResponse(
         "profile.html",
         {
@@ -235,7 +232,6 @@ async def profile(
             "theme": theme,
             "current_theme": current_theme,
             "user": current_user,
-            "books": books,
         },
     )
     set_theme_cookie(response, current_theme)

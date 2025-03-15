@@ -11,7 +11,7 @@ from datetime import datetime
 from . import models, database, themes, auth, auth_routes, admin_routes
 from .auth import get_optional_current_user
 
-app = FastAPI(title="FastAPI App")
+app = FastAPI(title="Book Tracker")
 templates = Jinja2Templates(directory="app/templates")
 
 # Add CORS middleware
