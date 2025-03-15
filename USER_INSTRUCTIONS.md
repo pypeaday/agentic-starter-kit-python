@@ -16,3 +16,8 @@ python project preferences)
 3. Then work with your model to perform the task of filing out the
    [deliverables](/agent/design/deliverables.md) based on the overview and the
 tech stack.
+
+## Development
+
+1. I like to manage python and environments myself with `uv` - so make a new repo, then `uv init` and either make a `requirements.txt` file or start using `uv add` to add requirements.
+2. I also typically manage docker myself without letting the Agent run docker commands - this repo comes with a dockerfile, compose file, and entrypoint script to serve as fodder for the docker setup
