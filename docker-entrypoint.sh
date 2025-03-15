@@ -3,11 +3,13 @@ set -e
 
 export VIRTUAL_ENV=/opt/venv
 
-# Run database migrations if alembic is available
-if command -v alembic &> /dev/null; then
-    echo "Running database migrations..."
-    alembic upgrade head || echo "no migrations"
-fi
+# Set up migrations if needed
+echo "Setting up migrations..."
+python scripts/setup_migrations.py
+
+# Run migrations
+echo "Running migrations..."
+python scripts/run_migrations.py
 
 # Start the application
 echo "Starting web server..."

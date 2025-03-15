@@ -26,3 +26,19 @@ class User(Base):
     role = Column(
         String(20), default="user", nullable=False
     )  # Options: 'user', 'admin'
+
+    # Relationships
+    todos = relationship("Todo", back_populates="user")
+
+
+class Todo(Base):
+    __tablename__ = "todos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(String(500), nullable=False)
+    completed = Column(Boolean, default=False)
+    created_at = Column(DateTime, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # Relationships
+    user = relationship("User", back_populates="todos")

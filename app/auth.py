@@ -190,3 +190,49 @@ def check_user_role(required_role: str):
 
 
 # Note: The async get_optional_current_user function defined above replaces this one
+
+
+def create_default_admin(db: Session):
+    """
+    Create the default administrator account.
+    This should be called when setting up a new instance of the application.
+    """
+    # Get admin credentials from environment or use defaults
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+    admin_password = os.getenv("ADMIN_PASSWORD", "admin123")  # Change in production!
+
+    # Check if admin already exists
+    admin = db.query(models.User).filter(models.User.email == admin_email).first()
+    if not admin:
+        # Create admin user
+        admin = models.User(
+            email=admin_email,
+            hashed_password=get_password_hash(admin_password),
+            is_active=True,
+            role="admin",
+            created_at=datetime.utcnow(),
+        )
+        db.add(admin)
+        try:
+            db.commit()
+            db.refresh(admin)
+            print(f"Created default admin user: {admin_email}")
+            print("IMPORTANT: Please change the default admin password in production!")
+        except Exception as e:
+            db.rollback()
+            print(f"Error creating admin user: {e}")
+            raise
+    return admin
+
+
+def ensure_admin_exists(db: Session):
+    """
+    Ensure that at least one admin user exists in the system.
+    Creates a default admin if none exists.
+    """
+    # Check if any admin user exists
+    admin = db.query(models.User).filter(models.User.role == "admin").first()
+    if not admin:
+        # Create default admin if no admin exists
+        admin = create_default_admin(db)
+    return admin

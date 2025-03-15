@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto">
+<div class="max-w-4xl mx-auto">
     {% if not user %}
     <div class="mb-8 bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2 text-center">
-        <h2 class="text-xl font-bold text-theme-accent mb-4">Welcome to Foo App!</h2>
-        <p class="text-theme-fg mb-4">A starter kit with FastAPI, HTMX, and SQLite.</p>
+        <h2 class="text-xl font-bold text-theme-accent mb-4">Welcome to FastAPI + HTMX Starter!</h2>
+        <p class="text-theme-fg mb-4">A modern web application starter kit with FastAPI, HTMX, SQLite, and user authentication.</p>
         <div class="flex justify-center space-x-4">
             <a href="/login" class="px-4 py-2 bg-theme-accent text-white rounded-md hover:opacity-90 transition-opacity">
                 <i class="fas fa-sign-in-alt mr-2"></i>Login
@@ -15,164 +15,72 @@
             </a>
         </div>
     </div>
+    {% else %}
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold mb-4">Welcome back, {{ user.email.split('@')[0] }}!</h1>
+        
+        <!-- Todo List Example -->
+        <div class="bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2">
+            <h2 class="text-xl font-bold mb-4">Todo List Example</h2>
+            
+            <!-- Add Todo Form -->
+            <form hx-post="/todos" 
+                  hx-target="#todo-list" 
+                  hx-swap="beforeend"
+                  class="flex gap-2 mb-6">
+                <input type="text" 
+                       name="content" 
+                       placeholder="Add a new todo..." 
+                       class="flex-1 px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
+                       required>
+                <button type="submit" 
+                        class="px-4 py-2 bg-theme-accent text-white rounded-md hover:opacity-90 transition-opacity">
+                    Add
+                </button>
+            </form>
+
+            <!-- Todo List -->
+            <div id="todo-list" class="space-y-2">
+                {% for todo in todos %}
+                <div id="todo-{{ todo.id }}" class="flex items-center gap-2 p-2 bg-theme-bg rounded-md">
+                    <input type="checkbox" 
+                           {% if todo.completed %}checked{% endif %}
+                           hx-post="/todos/{{ todo.id }}/toggle"
+                           hx-target="#todo-{{ todo.id }}"
+                           hx-swap="outerHTML"
+                           class="form-checkbox">
+                    <span class="flex-1 {% if todo.completed %}line-through text-theme-fg1{% endif %}">
+                        {{ todo.content }}
+                    </span>
+                    <button hx-delete="/todos/{{ todo.id }}"
+                            hx-target="#todo-{{ todo.id }}"
+                            hx-swap="outerHTML"
+                            class="text-theme-error hover:opacity-80">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Features Overview -->
+        <div class="mt-8 bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2">
+            <h2 class="text-xl font-bold mb-4">About This Starter Kit</h2>
+            <div class="space-y-4 text-theme-fg">
+                <p>This starter kit provides a solid foundation for building modern web applications with:</p>
+                <ul class="list-disc list-inside space-y-2 ml-4">
+                    <li><strong>FastAPI</strong> - Modern Python web framework with automatic OpenAPI docs</li>
+                    <li><strong>HTMX</strong> - Power of modern browser features with simple HTML attributes</li>
+                    <li><strong>SQLite + SQLAlchemy</strong> - Robust database with powerful ORM</li>
+                    <li><strong>Alembic Migrations</strong> - Database version control and schema management</li>
+                    <li><strong>JWT Authentication</strong> - Secure user authentication with refresh tokens</li>
+                    <li><strong>Theme System</strong> - Dynamic theme switching with cookie persistence</li>
+                    <li><strong>Tailwind CSS</strong> - Utility-first CSS framework for rapid UI development</li>
+                </ul>
+                <p class="text-theme-fg1 text-sm mt-4">The todo list above demonstrates these features working together in a real-world example.</p>
+            </div>
+        </div>
+    </div>
     {% endif %}
-    <style>
-        .dragging {
-            opacity: 0.6;
-            transform: scale(0.95);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-        .drag-over {
-            background-color: rgba(var(--theme-accent-rgb), 0.1);
-            border: 2px dashed var(--theme-accent);
-            border-radius: 0.5rem;
-        }
-    </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Initializing drag and drop handlers');
-            
-            // Function to set up drag and drop handlers
-            function setupDragAndDrop() {
-                // Make all book cards draggable
-                document.querySelectorAll('[draggable="true"]').forEach(card => {
-                    // Only add event listeners if they don't already exist
-                    if (!card.hasAttribute('data-drag-initialized')) {
-                        card.setAttribute('data-drag-initialized', 'true');
-                        
-                        card.addEventListener('dragstart', function(e) {
-                            console.log('Drag started:', this.id);
-                            e.dataTransfer.setData('text/plain', this.id.split('-')[1]);
-                            e.dataTransfer.effectAllowed = 'move';
-                            this.classList.add('dragging');
-                        });
-                        
-                        card.addEventListener('dragend', function() {
-                            this.classList.remove('dragging');
-                        });
-                    }
-                });
-            }
-            
-            // Set up drop zones
-            document.querySelectorAll('.book-list').forEach(dropZone => {
-                dropZone.addEventListener('dragover', function(e) {
-                    e.preventDefault(); // Allow drop
-                    this.classList.add('drag-over');
-                    this.closest('.status-column').classList.add('drag-over');
-                });
-                
-                dropZone.addEventListener('dragleave', function(e) {
-                    if (!e.relatedTarget || !this.contains(e.relatedTarget)) {
-                        this.classList.remove('drag-over');
-                        this.closest('.status-column').classList.remove('drag-over');
-                    }
-                });
-                
-                dropZone.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    console.log('Drop event occurred');
-                    
-                    // Remove highlight classes
-                    document.querySelectorAll('.drag-over').forEach(el => {
-                        el.classList.remove('drag-over');
-                    });
-                    
-                    // Get book ID and new status
-                    const bookId = e.dataTransfer.getData('text/plain');
-                    const newStatus = this.closest('.status-column').dataset.status;
-                    console.log(`Moving book ${bookId} to ${newStatus}`);
-                    
-                    // Create form data
-                    const formData = new FormData();
-                    formData.append('status', newStatus);
-                    
-                    // Send PATCH request
-                    fetch(`/books/${bookId}/status`, {
-                        method: 'PATCH',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Remove the book from its original location
-                        const bookElement = document.getElementById(`book-${bookId}`);
-                        if (bookElement) bookElement.remove();
-                        
-                        // Create a temporary container for the HTML
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = data.html;
-                        
-                        // Get the new book element
-                        const newBookElement = tempDiv.firstElementChild;
-                        
-                        // Add the book to the new status column
-                        this.appendChild(newBookElement);
-                        
-                        // Initialize HTMX on the new element
-                        if (window.htmx) {
-                            htmx.process(newBookElement);
-                            
-                            // Add event listeners to the edit and delete buttons
-                            const editButton = newBookElement.querySelector('button[hx-get^="/edit-book/"]');
-                            if (editButton) {
-                                editButton.addEventListener('click', function(e) {
-                                    const url = this.getAttribute('hx-get');
-                                    const target = this.getAttribute('hx-target');
-                                    
-                                    // Manually trigger HTMX request
-                                    htmx.ajax('GET', url, { target: target });
-                                    
-                                    // Add event listener for the cancel button after the edit form is loaded
-                                    setTimeout(() => {
-                                        const bookId = target.substring(6); // Remove '#book-' prefix
-                                        const cancelButton = document.querySelector(`${target} button[hx-get*="${bookId}"]`);
-                                        if (cancelButton) {
-                                            cancelButton.addEventListener('click', function(e) {
-                                                e.preventDefault();
-                                                const cancelUrl = this.getAttribute('hx-get');
-                                                const cancelTarget = this.getAttribute('hx-target');
-                                                
-                                                // Manually trigger HTMX request for cancel
-                                                htmx.ajax('GET', cancelUrl, { target: cancelTarget });
-                                                
-                                                // After the card is loaded back, re-initialize drag and drop
-                                                setTimeout(() => {
-                                                    setupDragAndDrop();
-                                                }, 100);
-                                            });
-                                        }
-                                    }, 100);
-                                });
-                            }
-                        }
-                        
-                        // Update counts
-                        updateBookCounts();
-                        
-                        // Re-setup drag and drop for the new element
-                        setupDragAndDrop();
-                    })
-                    .catch(error => {
-                        console.error('Error updating book status:', error);
-                    });
-                });
-            });
-            
-            // Function to update book counts
-            function updateBookCounts() {
-                document.querySelectorAll('.status-column').forEach(column => {
-                    const status = column.dataset.status;
-                    const count = column.querySelectorAll('.book-list > div[id^="book-"]').length;
-                    const countElement = column.querySelector('h2 span:last-child');
-                    if (countElement) countElement.textContent = count;
-                });
-            }
-            
-            // Initial setup
-            setupDragAndDrop();
-        });
-    </script>
-
-
 </div>
 {% endblock %}

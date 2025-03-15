@@ -6,26 +6,28 @@ services:
     volumes:
       - .:/app
     environment:
-      - OLLAMA_HOST=http://ollama:11435
-      - DATABASE_URL=sqlite:///data/foo.db
+      # Uncomment for the appropriate ollama host if you are using it
+      # - OLLAMA_HOST=http://ollama:11434
+      - DATABASE_URL=sqlite:///data/app.db
     env_file: .env
     restart: unless-stopped
-    depends_on:
-      - ollama
+### EXAMPLE OLLAMA SERVICE TO INCLUDE IN STACK
+#     depends_on:
+#       - ollama
 
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - "11435:11434"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+#   ollama:
+#     image: ollama/ollama:latest
+#     volumes:
+#       - ollama_data:/root/.ollama
+#     ports:
+#       - "11434:11434"
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#             - driver: nvidia
+#               count: all
+#               capabilities: [gpu]
 
-volumes:
-  ollama_data:
+# volumes:
+#   ollama_data:

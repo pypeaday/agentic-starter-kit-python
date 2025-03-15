@@ -16,9 +16,9 @@ data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 os.makedirs(data_dir, exist_ok=True)
 logger.info(f"Data directory: {data_dir}")
 
-# Use database path from environment variable or default to data/books.db
+# Use database path from environment variable or default to data/app.db
 SQLALCHEMY_DATABASE_URL = os.getenv(
-    "DATABASE_URL", f"sqlite:///{os.path.join(data_dir, 'foo.db')}"
+    "DATABASE_URL", f"sqlite:///{os.path.join(data_dir, 'app.db')}"
 )
 logger.info(f"Database URL: {SQLALCHEMY_DATABASE_URL}")
 

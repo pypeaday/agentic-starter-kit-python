@@ -35,6 +35,10 @@ ENV UV_PYTHON=$VIRTUAL_ENV/bin/python
 # Install dependencies using uv in the virtual environment
 RUN uv sync --active
 
+# Install build dependencies and the app package in development mode
+RUN uv pip install hatchling && \
+    uv pip install -e .
+
 # Expose port
 EXPOSE 8000
 

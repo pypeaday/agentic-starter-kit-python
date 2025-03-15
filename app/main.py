@@ -1,17 +1,16 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, Form, Cookie
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import Optional, List
-from pydantic import BaseModel, field_validator
-from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel
 
-from . import models, database, themes, auth, auth_routes, admin_routes
+from . import models, database, themes, auth, auth_routes, admin_routes, todo_routes
 from .auth import get_optional_current_user
 
-app = FastAPI(title="Book Tracker")
+app = FastAPI(title="FastAPI HTMX Starter")
 templates = Jinja2Templates(directory="app/templates")
 
 # Add CORS middleware
@@ -59,6 +58,9 @@ app.include_router(auth_routes.router)
 
 # Include admin routes
 app.include_router(admin_routes.router)
+
+# Include todo routes
+app.include_router(todo_routes.router)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -109,10 +111,16 @@ from sqlalchemy import inspect
 inspector = inspect(database.engine)
 existing_tables = inspector.get_table_names()
 
-# Only create tables that don't exist yet
-for table in models.Base.metadata.tables.values():
-    if table.name not in existing_tables:
-        table.create(database.engine)
+# Database should be created by alembic migrations
+# Create admin user if it doesn't exist
+print("Checking for admin user...")
+with database.SessionLocal() as db:
+    try:
+        admin = auth.ensure_admin_exists(db)
+        print(f"Admin user confirmed: {admin.email}")
+    except Exception as e:
+        print(f"Error ensuring admin user exists: {e}")
+        raise
 
 
 @app.get("/")
@@ -120,11 +128,20 @@ def home(request: Request, db: Session = Depends(database.get_db)):
     # Get current user from token cookie if available
     access_token = request.cookies.get("access_token")
     current_user = None
+    todos = []
 
     if access_token:
         # Token is stored without Bearer prefix
         try:
             current_user = auth.get_optional_current_user_sync(access_token, db)
+            if current_user:
+                # Get user's todos if authenticated
+                todos = (
+                    db.query(models.Todo)
+                    .filter(models.Todo.user_id == current_user.id)
+                    .order_by(models.Todo.created_at.desc())
+                    .all()
+                )
         except Exception as e:
             # Invalid token, ignore and proceed as anonymous user
             print(f"Authentication error: {e}")
@@ -138,6 +155,7 @@ def home(request: Request, db: Session = Depends(database.get_db)):
             "theme": theme,
             "current_theme": current_theme,
             "user": current_user,
+            "todos": todos,
         },
     )
     response.set_cookie(

@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "foo-agentic-starter-kit"
+name = "fastapi-htmx-starter"
 version = "0.0.1"
-description = "Add your description here"
+description = "A modern web application starter kit with FastAPI, HTMX, and SQLite"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -17,3 +21,6 @@ dependencies = [
     "sqlalchemy>=2.0.23",
     "uvicorn>=0.24.0",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
