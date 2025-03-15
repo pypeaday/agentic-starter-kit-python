@@ -1,0 +1,19 @@
+[project]
+name = "foo-agentic-starter-kit"
+version = "0.0.1"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.12.1",
+    "fastapi>=0.104.0",
+    "httpx>=0.25.0",
+    "jinja2>=3.1.2",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic[email]>=2.4.2",
+    "python-dotenv>=1.0.0",
+    "python-jose[cryptography]>=3.4.0",
+    "python-multipart>=0.0.20",
+    "sqlalchemy>=2.0.23",
+    "uvicorn>=0.24.0",
+]

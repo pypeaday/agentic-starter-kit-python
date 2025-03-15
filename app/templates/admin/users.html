@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <h1 class="text-2xl font-bold text-yellow-400 mb-6">Manage Users</h1>
+    
+    <div class="bg-bg1 border border-bg2 rounded-lg p-4 shadow-md mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-yellow-400">User Accounts</h2>
+            <a href="/admin/dashboard" class="text-blue-400 hover:text-aqua-400 transition">
+                Back to Dashboard
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-bg2 rounded-lg overflow-hidden">
+                <thead class="bg-bg3">
+                    <tr>
+                        <th class="py-2 px-4 text-left text-fg1">ID</th>
+                        <th class="py-2 px-4 text-left text-fg1">Email</th>
+                        <th class="py-2 px-4 text-left text-fg1">Role</th>
+                        <th class="py-2 px-4 text-left text-fg1">Status</th>
+                        <th class="py-2 px-4 text-left text-fg1">Created</th>
+                        <th class="py-2 px-4 text-left text-fg1">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="border-t border-bg3">
+                        <td class="py-2 px-4">{{ user.id }}</td>
+                        <td class="py-2 px-4">{{ user.email }}</td>
+                        <td class="py-2 px-4">
+                            <span class="px-2 py-1 rounded text-xs font-medium 
+                                {% if user.role == 'admin' %}bg-red-900 text-red-300
+                                {% else %}bg-blue-900 text-blue-300{% endif %}">
+                                {{ user.role }}
+                            </span>
+                        </td>
+                        <td class="py-2 px-4">
+                            <span class="px-2 py-1 rounded text-xs font-medium 
+                                {% if user.is_active %}bg-green-900 text-green-300
+                                {% else %}bg-red-900 text-red-300{% endif %}">
+                                {{ 'Active' if user.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td class="py-2 px-4">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td class="py-2 px-4">
+                            {% if user.id != current_user.id %}
+                            <div class="flex space-x-2">
+                                <button 
+                                    class="px-3 py-1 text-sm rounded bg-blue-900 text-blue-300 hover:bg-blue-800 transition"
+                                    hx-post="/admin/users/{{ user.id }}/toggle-role"
+                                    hx-swap="none"
+                                    hx-trigger="click"
+                                    hx-indicator="#indicator-{{ user.id }}"
+                                    onclick="setTimeout(() => { window.location.reload(); }, 300);"
+                                >
+                                    Toggle Role
+                                </button>
+                                <button 
+                                    class="px-3 py-1 text-sm rounded {% if user.is_active %}bg-red-900 text-red-300 hover:bg-red-800{% else %}bg-green-900 text-green-300 hover:bg-green-800{% endif %} transition"
+                                    hx-post="/admin/users/{{ user.id }}/toggle-active"
+                                    hx-swap="none"
+                                    hx-trigger="click"
+                                    hx-indicator="#indicator-{{ user.id }}"
+                                    onclick="setTimeout(() => { window.location.reload(); }, 300);"
+                                >
+                                    {{ 'Deactivate' if user.is_active else 'Activate' }}
+                                </button>
+                                <div id="indicator-{{ user.id }}" class="htmx-indicator">
+                                    <div class="spinner-border text-blue-400" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-fg1 italic">Current User</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    {% if not user %}
+    <div class="mb-8 bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2 text-center">
+        <h2 class="text-xl font-bold text-theme-accent mb-4">Welcome to Book Tracker!</h2>
+        <p class="text-theme-fg mb-4">Track your reading progress, organize your books, and keep a record of your reading journey.</p>
+        <div class="flex justify-center space-x-4">
+            <a href="/login" class="px-4 py-2 bg-theme-accent text-white rounded-md hover:opacity-90 transition-opacity">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </a>
+            <a href="/register" class="px-4 py-2 bg-theme-bg2 text-theme-fg rounded-md hover:bg-theme-bg border border-theme-bg2 transition-colors">
+                <i class="fas fa-user-plus mr-2"></i>Register
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <style>
+        .dragging {
+            opacity: 0.6;
+            transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .drag-over {
+            background-color: rgba(var(--theme-accent-rgb), 0.1);
+            border: 2px dashed var(--theme-accent);
+            border-radius: 0.5rem;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing drag and drop handlers');
+            
+            // Function to set up drag and drop handlers
+            function setupDragAndDrop() {
+                // Make all book cards draggable
+                document.querySelectorAll('[draggable="true"]').forEach(card => {
+                    // Only add event listeners if they don't already exist
+                    if (!card.hasAttribute('data-drag-initialized')) {
+                        card.setAttribute('data-drag-initialized', 'true');
+                        
+                        card.addEventListener('dragstart', function(e) {
+                            console.log('Drag started:', this.id);
+                            e.dataTransfer.setData('text/plain', this.id.split('-')[1]);
+                            e.dataTransfer.effectAllowed = 'move';
+                            this.classList.add('dragging');
+                        });
+                        
+                        card.addEventListener('dragend', function() {
+                            this.classList.remove('dragging');
+                        });
+                    }
+                });
+            }
+            
+            // Set up drop zones
+            document.querySelectorAll('.book-list').forEach(dropZone => {
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault(); // Allow drop
+                    this.classList.add('drag-over');
+                    this.closest('.status-column').classList.add('drag-over');
+                });
+                
+                dropZone.addEventListener('dragleave', function(e) {
+                    if (!e.relatedTarget || !this.contains(e.relatedTarget)) {
+                        this.classList.remove('drag-over');
+                        this.closest('.status-column').classList.remove('drag-over');
+                    }
+                });
+                
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    console.log('Drop event occurred');
+                    
+                    // Remove highlight classes
+                    document.querySelectorAll('.drag-over').forEach(el => {
+                        el.classList.remove('drag-over');
+                    });
+                    
+                    // Get book ID and new status
+                    const bookId = e.dataTransfer.getData('text/plain');
+                    const newStatus = this.closest('.status-column').dataset.status;
+                    console.log(`Moving book ${bookId} to ${newStatus}`);
+                    
+                    // Create form data
+                    const formData = new FormData();
+                    formData.append('status', newStatus);
+                    
+                    // Send PATCH request
+                    fetch(`/books/${bookId}/status`, {
+                        method: 'PATCH',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Remove the book from its original location
+                        const bookElement = document.getElementById(`book-${bookId}`);
+                        if (bookElement) bookElement.remove();
+                        
+                        // Create a temporary container for the HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = data.html;
+                        
+                        // Get the new book element
+                        const newBookElement = tempDiv.firstElementChild;
+                        
+                        // Add the book to the new status column
+                        this.appendChild(newBookElement);
+                        
+                        // Initialize HTMX on the new element
+                        if (window.htmx) {
+                            htmx.process(newBookElement);
+                            
+                            // Add event listeners to the edit and delete buttons
+                            const editButton = newBookElement.querySelector('button[hx-get^="/edit-book/"]');
+                            if (editButton) {
+                                editButton.addEventListener('click', function(e) {
+                                    const url = this.getAttribute('hx-get');
+                                    const target = this.getAttribute('hx-target');
+                                    
+                                    // Manually trigger HTMX request
+                                    htmx.ajax('GET', url, { target: target });
+                                    
+                                    // Add event listener for the cancel button after the edit form is loaded
+                                    setTimeout(() => {
+                                        const bookId = target.substring(6); // Remove '#book-' prefix
+                                        const cancelButton = document.querySelector(`${target} button[hx-get*="${bookId}"]`);
+                                        if (cancelButton) {
+                                            cancelButton.addEventListener('click', function(e) {
+                                                e.preventDefault();
+                                                const cancelUrl = this.getAttribute('hx-get');
+                                                const cancelTarget = this.getAttribute('hx-target');
+                                                
+                                                // Manually trigger HTMX request for cancel
+                                                htmx.ajax('GET', cancelUrl, { target: cancelTarget });
+                                                
+                                                // After the card is loaded back, re-initialize drag and drop
+                                                setTimeout(() => {
+                                                    setupDragAndDrop();
+                                                }, 100);
+                                            });
+                                        }
+                                    }, 100);
+                                });
+                            }
+                        }
+                        
+                        // Update counts
+                        updateBookCounts();
+                        
+                        // Re-setup drag and drop for the new element
+                        setupDragAndDrop();
+                    })
+                    .catch(error => {
+                        console.error('Error updating book status:', error);
+                    });
+                });
+            });
+            
+            // Function to update book counts
+            function updateBookCounts() {
+                document.querySelectorAll('.status-column').forEach(column => {
+                    const status = column.dataset.status;
+                    const count = column.querySelectorAll('.book-list > div[id^="book-"]').length;
+                    const countElement = column.querySelector('h2 span:last-child');
+                    if (countElement) countElement.textContent = count;
+                });
+            }
+            
+            // Initial setup
+            setupDragAndDrop();
+        });
+    </script>
+    <!-- Header with stats -->
+    <div class="mb-8 bg-theme-bg1 rounded-lg shadow-lg p-6 border border-theme-bg2">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {% for status in ['reading', 'to_read', 'completed', 'dnf'] %}
+            <div class="text-center">
+                <div class="text-2xl font-bold text-theme-accent">{{ books|selectattr('status', 'equalto', status)|list|length }}</div>
+                <div class="text-sm text-theme-fg1">{{ {'reading': 'Reading', 'to_read': 'To Read', 'completed': 'Completed', 'dnf': 'Did Not Finish'}[status] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Book grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for status in ['reading', 'to_read', 'completed', 'dnf'] %}
+        <div class="bg-theme-bg1 rounded-lg shadow-lg border border-theme-bg2 overflow-hidden status-column" data-status="{{ status }}">
+            <div class="bg-theme-bg2 px-6 py-4 border-b border-theme-bg2">
+                <h2 class="text-xl font-bold text-theme-fg flex items-center">
+                    <i class="fas fa-{{ {'reading': 'book-open', 'to_read': 'list', 'completed': 'check', 'dnf': 'times'}[status] }} mr-2"></i>
+                    <span>{{ {'reading': 'Reading', 'to_read': 'To Read', 'completed': 'Completed', 'dnf': 'Did Not Finish'}[status] }}</span>
+                    <span class="ml-auto text-sm font-normal bg-theme-bg2 px-2 py-1 rounded-full">{{ books|selectattr('status', 'equalto', status)|list|length }}</span>
+                </h2>
+            </div>
+            <div class="p-4 space-y-3 book-list">
+                 
+                {% for book in books if book.status == status %}
+                {% include "partials/book_card.html" %}
+                {% else %}
+                <div class="text-center py-8 text-theme-fg1">
+                    <i class="fas fa-book text-4xl mb-2 opacity-30"></i>
+                    <p>No books yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
