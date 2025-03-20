@@ -78,7 +78,8 @@ def test_login_remember_me(client, regular_user, test_password):
         },
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
-    assert response.cookies["access_token"]["max-age"] == 30 * 24 * 60 * 60  # 30 days
+    cookie = response.headers.get("set-cookie", "")
+    assert "max-age=2592000" in cookie.lower()  # 30 days = 30 * 24 * 60 * 60 = 2592000
 
 
 def test_login_invalid_credentials(client, regular_user):
