@@ -82,6 +82,9 @@ app.dependency_overrides[Request] = get_test_request
 
 class CustomTestClient(TestClient):
     def request(self, method, url, **kwargs):
+        # Disable following redirects
+        kwargs["follow_redirects"] = False
+
         # Create a mock Request object
         mock_request = Request(
             scope={
