@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
@@ -19,7 +18,10 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-templates = Jinja2Templates(directory="app/templates")
+
+def get_templates(request: Request):
+    """Get templates from app state."""
+    return request.app.state.templates
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
@@ -38,6 +40,7 @@ async def admin_dashboard(
         db.query(models.User).order_by(models.User.created_at.desc()).limit(5).all()
     )
 
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/dashboard.html",
         {
@@ -59,6 +62,7 @@ async def list_users(
 ):
     """List all users in the system."""
     users = db.query(models.User).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/users.html",
         {
@@ -79,6 +83,7 @@ async def new_user_form(
 ):
     """Show form to create a new user."""
     roles = db.query(models.Role).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/user_form.html",
         {
@@ -105,6 +110,7 @@ async def edit_user_form(
         raise HTTPException(status_code=404, detail="User not found")
 
     roles = db.query(models.Role).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/user_form.html",
         {
@@ -247,6 +253,7 @@ async def list_roles(
 ):
     """List all roles."""
     roles = db.query(models.Role).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/roles.html",
         {

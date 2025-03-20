@@ -9,7 +9,7 @@ from datetime import datetime
 from starlette.testclient import TestClient as StarletteTestClient
 
 from fastapi.templating import Jinja2Templates
-from app.main import app, templates
+from app.main import app
 from app.database import get_db
 from app.models import Base, User, Role, Todo  # Import Base from models and all models
 from app.auth import create_access_token, get_password_hash
@@ -17,8 +17,12 @@ from app.roles import DEFAULT_ROLES, ensure_default_roles_exist
 from app.jinja_filters import register_filters
 import json
 
-# Register Jinja2 filters for tests
-register_filters(templates)
+# Create and configure test-specific templates
+test_templates = Jinja2Templates(directory="app/templates")
+register_filters(test_templates)
+
+# Override the templates in the app for testing
+app.state.templates = test_templates
 
 # Use in-memory SQLite for tests
 SQLALCHEMY_DATABASE_URL = "sqlite://"
@@ -89,8 +93,9 @@ class CustomTestClient(TestClient):
             }
         )
 
-        # Add the mock request to app state
+        # Add the mock request and templates to app state
         app.state.request = mock_request
+        app.state.templates = test_templates
         return super().request(method, url, **kwargs)
 
 

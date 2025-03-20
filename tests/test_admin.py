@@ -10,7 +10,6 @@ def test_admin_dashboard_access(client, admin_headers):
     import json
     from pathlib import Path
 
-    # Path("respose.json").write_text(json.dumps(response.json()))
     assert response.status_code == status.HTTP_200_OK
     assert "Admin Dashboard" in response.text
 
