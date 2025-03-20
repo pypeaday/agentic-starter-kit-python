@@ -16,11 +16,15 @@ from . import (
     admin_routes,
     todo_routes,
     roles,
+    jinja_filters,
 )
 from .auth import get_optional_current_user
 
 app = FastAPI(title="FastAPI HTMX Starter")
 templates = Jinja2Templates(directory="app/templates")
+
+# Register custom Jinja2 filters
+jinja_filters.register_filters(templates)
 
 # Add CORS middleware
 app.add_middleware(
