@@ -62,7 +62,9 @@ def test_login_success(client, regular_user, test_password):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers["location"] == "/"
-    assert "access_token" in response.cookies
+    cookie = response.headers.get("set-cookie", "")
+    assert "access_token=" in cookie  # Cookie exists
+    assert "httponly" in cookie.lower()  # Cookie is httponly
     assert "HX-Trigger" in response.headers
 
 
@@ -115,8 +117,9 @@ def test_logout(client, user_headers):
     response = client.get("/logout", headers=user_headers)
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers["location"] == "/login"
-    assert "access_token" in response.cookies
-    assert not response.cookies["access_token"].value  # Cookie should be empty
+    cookie = response.headers.get("set-cookie", "")
+    assert "access_token=" in cookie  # Cookie exists
+    assert "max-age=0" in cookie.lower()  # Cookie is being deleted
     assert "HX-Trigger" in response.headers
 
 
