@@ -35,15 +35,18 @@
                         <td class="py-2 px-4">{{ role.name }}</td>
                         <td class="py-2 px-4">{{ role.description or '-' }}</td>
                         <td class="py-2 px-4">
-                            {% set permissions = role.permissions|tojson|safe %}
+                            {% set permissions = role.permissions|fromjson %}
                             <div class="flex flex-wrap gap-1">
-                                {% for perm in permissions.keys() %}
+                                {% for perm, enabled in permissions.items() %}
+                                {% if enabled %}
                                 <span class="px-2 py-1 text-xs rounded bg-theme-accent text-white">
                                     {{ perm }}
                                 </span>
-                                {% else %}
-                                <span class="text-theme-fg1 italic">No permissions defined</span>
+                                {% endif %}
                                 {% endfor %}
+                                {% if not permissions %}
+                                <span class="text-theme-fg1 italic">No permissions defined</span>
+                                {% endif %}
                             </div>
                         </td>
                         <td class="py-2 px-4">

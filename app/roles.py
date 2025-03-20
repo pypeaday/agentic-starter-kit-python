@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 from sqlalchemy.orm import Session
+from fastapi import Request
 from . import models
 
 DEFAULT_ROLES = {
@@ -79,22 +80,21 @@ def requires_permission(permission: str):
     from .database import get_db
 
     def decorator(func):
-        async def wrapper(*args, **kwargs):
-            user = kwargs.get("current_user")
-            if not user:
-                # If current_user is not in kwargs, try to get it
-                db = kwargs.get("db") or next(get_db())
-                user = await get_current_active_user(db=db)
+        # Preserve the original function's signature
+        from functools import wraps
 
-            if not has_permission(user, permission):
+        @wraps(func)
+        async def wrapper(
+            *args,
+            current_user: models.User = Depends(get_current_active_user),
+            **kwargs,
+        ):
+            if not has_permission(current_user, permission):
                 raise HTTPException(
                     status_code=403, detail=f"Permission denied: {permission} required"
                 )
-            return await func(*args, **kwargs)
+            return await func(*args, current_user=current_user, **kwargs)
 
-        # Copy metadata from original function
-        wrapper.__name__ = func.__name__
-        wrapper.__doc__ = func.__doc__
         return wrapper
 
     return decorator

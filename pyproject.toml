@@ -24,3 +24,24 @@ dependencies = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "httpx>=0.25.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+env = [
+    "ENVIRONMENT=testing",
+    "TESTING=true",
+]

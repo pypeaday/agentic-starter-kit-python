@@ -1,0 +1,1 @@
+{"detail": [{"type": "missing", "loc": ["query", "args"], "msg": "Field required", "input": null}, {"type": "missing", "loc": ["query", "kwargs"], "msg": "Field required", "input": null}]}

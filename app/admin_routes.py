@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
@@ -19,15 +18,18 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-templates = Jinja2Templates(directory="app/templates")
+
+def get_templates(request: Request):
+    """Get templates from app state."""
+    return request.app.state.templates
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
 @requires_permission("view_system")
 async def admin_dashboard(
     request: Request,
-    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """Admin dashboard showing system statistics and management options."""
     # Get user count
@@ -38,6 +40,7 @@ async def admin_dashboard(
         db.query(models.User).order_by(models.User.created_at.desc()).limit(5).all()
     )
 
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/dashboard.html",
         {
@@ -54,11 +57,12 @@ async def admin_dashboard(
 @requires_permission("view_users")
 async def list_users(
     request: Request,
-    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """List all users in the system."""
     users = db.query(models.User).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/users.html",
         {
@@ -74,11 +78,12 @@ async def list_users(
 @requires_permission("manage_users")
 async def new_user_form(
     request: Request,
-    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """Show form to create a new user."""
     roles = db.query(models.Role).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/user_form.html",
         {
@@ -94,10 +99,10 @@ async def new_user_form(
 @router.get("/users/{user_id}/edit", response_class=HTMLResponse)
 @requires_permission("manage_users")
 async def edit_user_form(
-    user_id: int,
     request: Request,
-    current_user: models.User = Depends(auth.get_current_active_user),
+    user_id: int,
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """Show form to edit a user."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -105,6 +110,7 @@ async def edit_user_form(
         raise HTTPException(status_code=404, detail="User not found")
 
     roles = db.query(models.Role).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/user_form.html",
         {
@@ -121,13 +127,13 @@ async def edit_user_form(
 @requires_permission("manage_users")
 async def create_user(
     request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
     email: str = Form(...),
     password: str = Form(...),
     name: str = Form(None),
     role: str = Form("user"),
     is_active: bool = Form(True),
-    current_user: models.User = Depends(auth.get_current_active_user),
-    db: Session = Depends(get_db),
 ):
     """Create a new user."""
     # Check if email already exists
@@ -160,13 +166,14 @@ async def create_user(
 @router.put("/users/{user_id}")
 @requires_permission("manage_users")
 async def update_user(
+    request: Request,
     user_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
     email: str = Form(...),
     name: str = Form(None),
     role: str = Form("user"),
     is_active: bool = Form(True),
-    current_user: models.User = Depends(auth.get_current_active_user),
-    db: Session = Depends(get_db),
 ):
     """Update a user's information."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -206,9 +213,10 @@ async def update_user(
 @router.post("/users/{user_id}/reset-password")
 @requires_permission("manage_users")
 async def reset_user_password(
+    request: Request,
     user_id: int,
-    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """Reset a user's password to a random string."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -240,11 +248,12 @@ async def reset_user_password(
 @requires_permission("view_roles")
 async def list_roles(
     request: Request,
-    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """List all roles."""
     roles = db.query(models.Role).all()
+    templates = get_templates(request)
     return templates.TemplateResponse(
         "admin/roles.html",
         {
@@ -259,11 +268,12 @@ async def list_roles(
 @router.post("/roles")
 @requires_permission("manage_roles")
 async def create_role(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
     name: str = Form(...),
     description: str = Form(None),
     permissions: str = Form("{}"),  # JSON string of permissions
-    current_user: models.User = Depends(auth.get_current_active_user),
-    db: Session = Depends(get_db),
 ):
     """Create a new role."""
     # Validate name is unique
@@ -294,12 +304,13 @@ async def create_role(
 @router.put("/roles/{role_id}")
 @requires_permission("manage_roles")
 async def update_role(
+    request: Request,
     role_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
     name: str = Form(...),
     description: str = Form(None),
     permissions: str = Form("{}"),
-    current_user: models.User = Depends(auth.get_current_active_user),
-    db: Session = Depends(get_db),
 ):
     """Update a role."""
     role = db.query(models.Role).filter(models.Role.id == role_id).first()
@@ -335,9 +346,10 @@ async def update_role(
 @router.delete("/roles/{role_id}")
 @requires_permission("manage_roles")
 async def delete_role(
+    request: Request,
     role_id: int,
-    current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user),
 ):
     """Delete a role."""
     role = db.query(models.Role).filter(models.Role.id == role_id).first()
