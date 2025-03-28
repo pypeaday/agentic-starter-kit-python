@@ -1,68 +1,62 @@
 # Development Progress
 
-<INSTRUCTION immutable>
-This document tracks overall project progress and milestones. It provides a high-level view of development status and serves as an index for detailed progress logs.
+This directory tracks development progress through checkpoints and regular updates. It provides a chronological view of project evolution and milestone achievements.
 
-## Progress Tracking Structure
+## Structure
 
-1. **Checkpoints**
-   - Major development milestones
-   - Recorded in chronological order
-   - Tagged with dates and categories
+1. `checkpoints.md` - Major milestone tracking
+2. Daily/weekly updates - Individual progress files
 
-2. **Task Status**
-   - Current task state
-   - Blocked items
-   - Next actions
+## File Types
 
-3. **Categories**
-   - Setup: Initial project configuration
-   - Feature: New functionality
-   - Refactor: Code improvements
-   - Fix: Bug fixes
-   - Doc: Documentation updates
+### Checkpoints (checkpoints.md)
 
-## Format
+Tracks major project milestones and significant achievements. Format:
 
 ```markdown
-## [YYYY-MM-DD] Category: Title
+## [Date] Milestone Name
 
-### Completed
-- List of completed items
+### Achieved
+- List of completed objectives
 
-### In Progress
-- Current work items
+### Status
+Current project status
 
-### Blocked
-- Blocked items and reasons
-
-### Next
-- Upcoming tasks
+### Next Goals
+- Upcoming objectives
 ```
-</INSTRUCTION>
 
-<LOG append>
-# Progress Log
+### Progress Updates (YYYY-MM-DD-update.md)
 
-## [2025-01-25] Setup: Initial Template Structure
+Daily or weekly progress updates. Format:
 
-### Completed
-- [x] Created agent workspace structure
-- [x] Established core context files
-- [x] Defined interaction guidelines
-- [x] Set up progress tracking
-- [x] Created decision log structure
+```markdown
+# YYYY-MM-DD Progress Update
 
-### In Progress
-- [ ] Validating initial structure
-- [ ] Creating workspace templates
+## Completed
+- [ ] Task 1
+- [x] Task 2
+- [x] Task 3
 
-### Blocked
-- None
+## In Progress
+- Current work items
+- Blocked items with reasons
 
-### Next
-- Create example workspace templates
-- Add validation guidelines
-- Document usage patterns
+## Notes
+Additional context or observations
 
-</LOG>
+## Next Steps
+- Planned next actions
+```
+
+## Usage Guidelines
+
+1. Create regular progress updates (daily/weekly as needed)
+2. Update checkpoints for significant milestones
+3. Use ISO date format for all dates
+4. Link related decisions or learnings
+5. Keep content factual and concise
+
+## Current Status
+
+The latest project status can be found in the most recent checkpoint and update files.

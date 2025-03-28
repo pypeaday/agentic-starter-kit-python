@@ -1,76 +1,41 @@
-# Technical Decisions Log
+# Technical Decisions
 
-<INSTRUCTION immutable>
-This document tracks significant technical decisions made during development. Each decision should include:
+This directory contains records of key technical decisions made during development. Each decision should be documented in a separate file with an ISO date prefix.
 
-1. Context of the decision
-2. Options considered
-3. Selected approach
-4. Rationale
-5. Implementation implications
-6. Date of decision
-
-## Format
+## File Format
 
 ```markdown
-## [YYYY-MM-DD] Decision Title
+# YYYY-MM-DD Decision Title
 
-### Context
-Brief description of the situation requiring a decision
+## Context
+Brief description of the situation that requires a decision
 
-### Options Considered
-1. Option 1
+## Options Considered
+1. Option A
    - Pros
    - Cons
-2. Option 2
+2. Option B
    - Pros
    - Cons
 
-### Selected Approach
-Description of the chosen solution
+## Decision
+Clear statement of the chosen option and why
 
-### Rationale
-Explanation of why this approach was selected
+## Consequences
+Expected outcomes and impacts of this decision
 
-### Implications
-- Impact on development
-- Required changes
-- Future considerations
+## Status
+Current status (e.g., Accepted, Superseded, Deprecated)
 ```
-</INSTRUCTION>
 
-<LOG append>
-# Decisions Log
+## Usage Guidelines
 
-## [2025-01-25] Initial Project Structure
+1. Create a new file for each significant technical decision
+2. Use the ISO date prefix: `YYYY-MM-DD-decision-title.md`
+3. Follow the standard format above
+4. Link related decisions where relevant
+5. Update status if decision is superseded
 
-### Context
-Need to establish a template structure for agent-assisted development projects that maintains clear context and enables efficient collaboration.
+## Current Decisions
 
-### Options Considered
-1. Traditional project structure with docs/
-   - Pros: Familiar to developers
-   - Cons: Not optimized for agent interaction
-2. Agent-centric structure
-   - Pros: Better supports AI collaboration
-   - Cons: New pattern to learn
-3. Hybrid approach
-   - Pros: Balances familiarity with AI optimization
-   - Cons: More complex structure
-
-### Selected Approach
-Agent-centric structure with clear separation of context, memory, and workspace
-
-### Rationale
-- Optimizes for AI-human collaboration
-- Maintains clear context boundaries
-- Enables efficient knowledge transfer
-- Supports incremental development
-
-### Implications
-- New project structure pattern to document
-- Need for clear usage guidelines
-- Potential learning curve for teams
-- Better long-term maintainability
-
-</LOG>
+(This section is automatically updated as decisions are added)

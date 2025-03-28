@@ -76,3 +76,10 @@ Implement each method as either a query or a command. Apply naming convention to
 - By clearly separating methods into queries and commands the programmer can code with additional confidence without knowing each method's implementation details.
 
 </INSTRUCTION>
+
+<LOG append>
+# Standards Updates
+
+Record any clarifications or additions to coding standards here:
+
+</LOG>

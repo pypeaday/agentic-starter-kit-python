@@ -71,23 +71,39 @@ Configure these variables in your `.env` file:
 ## Project Structure
 
 ```
-app/
-├── __init__.py
-├── main.py              # FastAPI application setup
-├── database.py          # Database configuration
-├── models.py            # SQLAlchemy models
-├── auth.py             # Authentication logic
-├── htmx.py            # HTMX utility functions
-├── static/
-│   └── css/
-│       └── theme.css   # Theme styles
-└── templates/
-    ├── base.html       # Base template
-    ├── index.html      # Home page
-    ├── login.html      # Login page
-    ├── register.html   # Registration page
-    {% if include_admin_interface %}└── admin/
-        └── dashboard.html  # Admin dashboard{% endif %}
+.
+├── app/                  # Application source code
+│   ├── __init__.py
+│   ├── main.py          # FastAPI application setup
+│   ├── database.py      # Database configuration
+│   ├── models.py        # SQLAlchemy models
+│   ├── auth.py         # Authentication logic
+│   ├── htmx.py        # HTMX utility functions
+│   ├── static/
+│   │   └── css/
+│   │       └── theme.css # Theme styles
+│   └── templates/
+│       ├── base.html    # Base template
+│       ├── index.html   # Home page
+│       ├── login.html   # Login page
+│       ├── register.html # Registration page
+│       {% if include_admin_interface %}└── admin/
+│           └── dashboard.html # Admin dashboard{% endif %}
+│
+└── agent/               # AI agent workspace
+    ├── context/        # Core project context (immutable)
+    │   ├── architecture.md
+    │   ├── constraints.md
+    │   ├── goals.md
+    │   └── standards/
+    ├── memory/         # Persistent knowledge (append-only)
+    │   ├── decisions/
+    │   ├── progress/
+    │   └── learnings/
+    └── workspace/      # Active development (mutable)
+        ├── current/
+        ├── planning/
+        └── validation/
 ```
 
 ## Authentication
