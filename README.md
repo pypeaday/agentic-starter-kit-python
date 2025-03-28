@@ -29,7 +29,7 @@ pipx install copier
 
 ```bash
 # Create a new project
-copier copy gh:pypeaday/fastapi-htmx-starter my-project
+copier copy gh:pypeaday/agentic-starter-kit-python my-project
 ```
 
 ### Configuration Options
