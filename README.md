@@ -1,12 +1,6 @@
-# Agentic Python Project Template
+# Agentic Project Template
 
-A minimal template that adds AI agent context management to your Python projects. This template provides the necessary structure for maintaining project context, memory, and workspace for AI-assisted development.
-
-## Features
-
-- **AI Agent Context Management**: Structured directories for maintaining project context, decisions, and workspace
-- **.clinerules Configuration**: Ready-to-use configuration for AI agent interactions
-- **Minimal Setup**: Only copies the essential files needed for AI-assisted development
+A minimal template that adds AI agent context management to your projects. This template provides the necessary structure for maintaining project context, memory, and workspace for AI-assisted development.
 
 ## Adding to Your Project
 
@@ -53,10 +47,6 @@ To update your project's agent context with the latest template changes:
 ```bash
 copier update
 ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

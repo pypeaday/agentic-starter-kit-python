@@ -1,24 +1,5 @@
 # Template information
 _min_copier_version: "9.0.0"
-_templates_suffix: .jinja
 
-# Project metadata
-project_name:
-  type: str
-  help: Your project name
-  default: My Project
-
-project_slug:
-  type: str
-  help: Project slug (used in file names)
-  default: "{{ project_name|lower|replace(' ', '-')|replace('_', '-') }}"
-
-# Template configuration
 _subdirectory: template # Put template files in a subdirectory
 _answers_file: .copier-answers.yml # Store answers for later updates
-
-# Files/folders to exclude
-_exclude:
-- "**/__pycache__"
-- "**/*.pyc"
-- ".pytest_cache"
