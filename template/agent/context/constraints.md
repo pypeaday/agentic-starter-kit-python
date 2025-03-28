@@ -1,63 +1,58 @@
 # Project Constraints
 
-<INSTRUCTION immutable>
-This document outlines the key constraints and limitations that all agents must consider during development.
+This document outlines the key limitations and requirements that must be considered during development.
 
 ## Technical Constraints
 
-1. **Simplicity**
-   - Minimize dependencies
-   - Prefer standard libraries over third-party packages
-   - Keep configuration minimal
+1. **Development**
+   - Use standard libraries when possible
+   - Minimize external dependencies
+   - Keep configuration simple
+   - Support cross-platform usage
 
-2. **Portability**
-   - Must work across different operating systems
-   - No system-specific dependencies
-   - Platform-agnostic file paths
+2. **Documentation**
+   - Use markdown for all docs
+   - Keep files text-based
+   - Follow clear structure
 
-3. **Documentation**
-   - All files must be text-based (markdown preferred)
-   - No binary documentation formats
-   - Clear structure for AI parsing
+3. **Testing**
+   - Write purposeful tests
+   - Focus on key functionality
+   - Ensure cross-platform compatibility
 
 ## Process Constraints
 
-1. **Agent Interaction**
-   - One tool use per interaction
-   - Explicit state management
-   - Clear progress tracking
+1. **Task Management**
+   - One task active at a time
+   - Document key decisions
+   - Track progress clearly
 
-2. **Memory Management**
-   - Append-only logs for progress
-   - Immutable core documentation
-   - Version-controlled decision history
+2. **Code Changes**
+   - Make incremental updates
+   - Test changes thoroughly
+   - Update documentation
 
-3. **Context Boundaries**
-   - Clear separation of concerns
-   - Well-defined responsibility areas
-   - Explicit context switching
+3. **Tools**
+   - Use standard development tools
+   - Support CLI operations
+   - Avoid platform-specific features
 
-## Implementation Constraints
+## Implementation Guidelines
 
-1. **Code Structure**
-   - No unit tests unless requested
-   - Minimal boilerplate
-   - Clear file organization
+1. **Code**
+   - Keep solutions simple
+   - Write clear documentation
+   - Make testing straightforward
 
-2. **Development Flow**
-   - Incremental changes
-   - Document-first approach
-   - Explicit validation steps
+2. **Documentation**
+   - Focus on essential info
+   - Keep structure consistent
+   - Update with changes
 
-3. **Tooling**
-   - CLI-first approach
-   - Standard development tools
-   - No specialized IDEs required
-</INSTRUCTION>
+3. **Workflow**
+   - Review context first
+   - Document decisions
+   - Track progress
+   - Validate changes
 
-<LOG append>
-# Constraint Updates
-
-Record any updates or clarifications to project constraints here:
-
-</LOG>
+Remember: Simplicity and clarity over complexity.

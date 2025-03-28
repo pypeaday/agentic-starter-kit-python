@@ -1,79 +1,44 @@
 # Agent Workspace
 
-This directory serves as the primary workspace for AI agents collaborating on this project. It follows a clear three-part structure to optimize AI-human interaction and maintain clear context across development sessions.
+This directory serves as the workspace for AI agents collaborating on this project. It follows a simplified structure to optimize focus and maintain essential context.
 
 ## Directory Structure
 
 ```
 agent/
-├── context/                # Core project context (immutable)
-│   ├── architecture.md    # System architecture and patterns
-│   ├── constraints.md     # Project constraints and limitations
-│   ├── goals.md          # Project objectives and success criteria
-│   └── standards/        # Development standards and practices
-│       ├── coding.md     # Coding standards and principles
-│       └── docs.md       # Documentation guidelines
-├── memory/                # Persistent knowledge (append-only)
-│   ├── decisions/        # Key technical decisions and rationales
-│   │   └── YYYY-MM-DD-title.md
-│   ├── progress/         # Development progress and milestones
-│   │   ├── checkpoints.md
-│   │   └── YYYY-MM-DD-update.md
-│   └── learnings/        # Insights and lessons learned
-│       └── YYYY-MM-DD-topic.md
-└── workspace/             # Active development (mutable)
-    ├── current/          # Current task context and state
-    │   ├── task.md       # Current task description and status
-    │   └── notes.md      # Working notes and temporary content
-    ├── planning/         # Task breakdown and implementation plans
-    └── validation/       # Testing and verification criteria
+├── context/     # Project context & constraints
+│   ├── goals.md          # Project objectives
+│   └── constraints.md    # Project limitations
+├── current/     # Active task & notes
+│   ├── task.md          # Current task details
+│   └── notes.md         # Working notes
+└── history/     # Decisions & progress
+    ├── decisions/       # Key technical decisions
+    └── progress.md      # Development progress
 ```
-
-## Core Principles
-
-1. **Context First**
-   - All agents must review relevant files in `/context` before starting work
-   - Context files are immutable and define project boundaries
-   - Standards in `/context/standards` guide all development
-
-2. **Memory Management**
-   - Decisions, progress, and learnings are tracked in `/memory`
-   - All memory files are append-only
-   - Use ISO date prefixes (YYYY-MM-DD) for all memory files
-   - Checkpoints track major milestones
-
-3. **Active Development**
-   - All current work happens in `/workspace`
-   - One task active at a time in `/workspace/current`
-   - Plans and validation criteria stay with the task
-
-## Documentation Rules
-
-1. **Content Types**
-   - Immutable: `<INSTRUCTION immutable>` sections cannot be modified
-   - Append-only: `<LOG append>` sections for chronological updates
-   - Task lists: Use `- [ ]` format for todos, `- [x]` for completed items
-
-2. **File Management**
-   - Keep files focused and single-purpose
-   - Use clear, descriptive names
-   - Follow consistent markdown formatting
-   - Include creation date in memory files
 
 ## Usage Guidelines
 
-1. Start each task by:
-   - Reviewing relevant context
-   - Creating or updating task.md in workspace/current
-   - Breaking down implementation in planning/
+1. **Active Development**
+   - Keep current task details in current/task.md
+   - Use current/notes.md for temporary work
+   - Clean up after task completion
 
-2. During development:
-   - Document decisions as they're made
-   - Update progress regularly
-   - Validate against requirements
-   - Keep workspace clean
+2. **Context Management**
+   - Review relevant files in context/
+   - Reference goals.md and constraints.md
+   - Keep documentation focused
 
-3. Complete each task by:
-   - Documenting learnings
-   - Creating a progress checkpoint
-   - Cleaning the workspace
+3. **Progress Tracking**
+   - Document decisions in history/decisions/
+   - Update progress in history/progress.md
+   - Use [TODO] and [DONE] markers
+
+## Best Practices
+
+- Work on one task at a time
+- Keep documentation minimal but clear
+- Document important decisions
+- Clean up workspace after completion
+
+For detailed guidelines, see the project's .clinerules file.

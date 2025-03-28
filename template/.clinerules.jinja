@@ -1,0 +1,74 @@
+{%- if exists('.clinerules') %}
+{%- set filename = '.clinerules' ~ (get_files('.clinerules*')|length + 1) %}
+{%- else %}
+{%- set filename = '.clinerules' %}
+{%- endif %}
+{#- The above logic will be processed by copier to determine the output filename #}
+<PROMPT ignore immutable>
+
+# Agent Guidelines
+
+## Directory Structure
+
+```
+agent/
+├── context/     # Project context & constraints
+├── current/     # Active task & notes
+└── history/     # Decisions & progress
+```
+
+## Core Principles
+
+1. **Focus on Current Task**
+   - Keep active work in current/
+   - Document decisions in history/
+   - Reference context/ as needed
+
+2. **Simple Progress Tracking**
+   - Use [TODO] and [DONE] markers
+   - Update history/ after completing tasks
+   - Keep one task active at a time
+
+3. **Essential Documentation**
+   - Document key decisions
+   - Track major progress points
+   - Keep notes focused and relevant
+
+## Development Rules
+
+1. **Task Workflow**
+   - Review relevant context
+   - Document approach in current/
+   - Implement solution
+   - Record completion in history/
+
+2. **Code Standards**
+   - Write testable code
+   - Keep solutions simple
+   - Document significant changes
+
+3. **Quality Guidelines**
+   - Validate against requirements
+   - Test changes thoroughly
+   - Update documentation
+
+## Best Practices
+
+1. **Stay Focused**
+   - Work on one task at a time
+   - Keep documentation minimal but clear
+   - Clean up after task completion
+
+2. **Maintain Context**
+   - Reference relevant documentation
+   - Document important decisions
+   - Track significant changes
+
+3. **Progressive Enhancement**
+   - Start simple
+   - Add complexity only when needed
+   - Document architectural changes
+
+When in doubt, ask for clarification. Keep solutions simple and documentation clear.
+
+</PROMPT>

@@ -1,34 +1,46 @@
 # Project Goals
 
-<INSTRUCTION immutable>
-This document defines the core objectives and success criteria for the project. All development decisions should align with these goals.
+This document outlines the key objectives and success criteria for the project.
 
 ## Primary Objectives
 
-1. Create a template repository optimized for AI-human collaboration
-2. Establish clear patterns for agent-assisted development
-3. Maintain consistent context across development sessions
-4. Enable efficient knowledge transfer between sessions
+1. **Simplicity**
+   - Keep solutions straightforward
+   - Minimize complexity
+   - Focus on essential features
+
+2. **Maintainability**
+   - Write clear, testable code
+   - Document key decisions
+   - Track progress effectively
+
+3. **Usability**
+   - Create intuitive interfaces
+   - Provide clear documentation
+   - Enable easy deployment
 
 ## Success Criteria
 
-1. Clear documentation structure that guides agent behavior
-2. Consistent patterns for recording decisions and progress
-3. Efficient context management for AI agents
-4. Minimal overhead for human developers
-5. Easy adaptation for different project types
+1. **Code Quality**
+   - Passes all tests
+   - Follows project standards
+   - Easy to understand
 
-## Non-Goals
+2. **Documentation**
+   - Clear usage instructions
+   - Key decisions documented
+   - Progress tracked
 
-1. Implementing specific business logic
-2. Creating deployment configurations
-3. Setting up CI/CD pipelines
-4. Defining project-specific architecture
-</INSTRUCTION>
+3. **Deployment**
+   - Simple setup process
+   - Minimal dependencies
+   - Cross-platform support
 
-<LOG append>
-# Goal Updates
+## Priorities
 
-Record any updates or clarifications to project goals here:
+1. Working solution
+2. Clear documentation
+3. Quality tests
+4. Performance optimization
 
-</LOG>
+Focus on delivering working solutions before adding complexity.
