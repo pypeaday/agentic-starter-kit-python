@@ -5,8 +5,8 @@ _subdirectory: template # Put template files in a subdirectory
 _answers_file: .copier-answers.yml # Store answers for later updates
 
 # Template configuration
-_tasks:
-- name: "Backup .clinerules"
+_tasks_pre:
+- name: "Backup existing .clinerules"
   command: >
     if [ -f ".clinerules" ]; then
       cp .clinerules ".clinerules$(date +%s)"
