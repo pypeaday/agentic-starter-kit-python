@@ -6,20 +6,10 @@ _answers_file: .copier-answers.yml # Store answers for later updates
 
 # Template configuration
 _tasks:
-- task: |
-    import os
-    import glob
+  - cmd: |
+        if [ -f ".clinerules" ]; then
+          cp .clinerules ".clinerules$(date +%s)"
+          echo "Found existing .clinerules, created timestamped backup"
+        fi
 
-    # Check if .clinerules exists
-    if os.path.exists('.clinerules'):
-        # Find all .clinerules* files
-        existing = glob.glob('.clinerules*')
-        # Create new filename with next number
-        new_name = f'.clinerules{len(existing) + 1}'
-        # Rename the templated file
-        if os.path.exists('.clinerules'):
-            os.rename('.clinerules', new_name)
-            print(f"Existing .clinerules found, new file saved as {new_name}")
-  type: python
-
-_templates_suffix: .jinja
+_templates_suffix: "" # Don't use Jinja templating

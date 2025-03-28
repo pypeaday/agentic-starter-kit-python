@@ -1,9 +1,3 @@
-{%- if exists('.clinerules') %}
-{%- set filename = '.clinerules' ~ (get_files('.clinerules*')|length + 1) %}
-{%- else %}
-{%- set filename = '.clinerules' %}
-{%- endif %}
-{#- The above logic will be processed by copier to determine the output filename #}
 <PROMPT ignore immutable>
 
 # Agent Guidelines
