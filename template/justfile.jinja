@@ -1,6 +1,0 @@
-build:
-    docker build -t registry.paynepride.com/{{ project_slug }}:latest .
-
-push:
-    just build
-    docker push registry.paynepride.com/{{ project_slug }}:latest
