@@ -6,7 +6,8 @@ _answers_file: .copier-answers.yml # Store answers for later updates
 
 # Template configuration
 _tasks:
-- command: |
+- name: "Backup .clinerules"
+  command: >
     if [ -f ".clinerules" ]; then
       cp .clinerules ".clinerules$(date +%s)"
       echo "Found existing .clinerules, created timestamped backup"
